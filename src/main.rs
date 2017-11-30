@@ -1,9 +1,8 @@
 mod config;
 mod backtracker;
-#[cfg(test)]
-mod test;
+mod queen;
 
-use config::QueensConfig;
+use queen::QueensConfig;
 use backtracker::Backtracker;
 
 fn main() {
