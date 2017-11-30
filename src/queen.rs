@@ -9,29 +9,47 @@ pub struct QueensConfig {
 }
 
 impl QueensConfig {
-    pub fn new() -> QueensConfig {
+    pub fn new(row: usize, col: usize) -> QueensConfig {
         let mut map = [[false; 8]; 8];
 
-        // todo: randomize this
-        map[1][1] = true;
+        // Start with one queen
+        map[row][col] = true;
 
-        QueensConfig { map, row: 1, col: 1 }
+        QueensConfig { map, row, col }
     }
 
     pub fn new_from(old_config: &QueensConfig, row: usize, col: usize) -> QueensConfig {
         let mut new_map = old_config.map;
         new_map[row][col] = true;
 
-        QueensConfig { map: new_map, row, col: old_config.col + 1 }
+        QueensConfig { map: new_map, row, col }
     }
 }
 
 impl Config for QueensConfig {
     fn successors(&self) -> Vec<QueensConfig> {
+        // Get the next column to generate successors in
+        let new_col = if self.col == self.map.len() - 1 {
+            // If we're at the right side of the map, check if we should wrap to the left side
+            for row in self.map.iter() {
+                // We only wrap back if there are no queens in the left-most column
+                if row[0] {
+                    return vec![];
+                }
+            }
+
+            // If the left-most column is empty, use that column
+            0
+        }
+        else {
+            // Keep moving right
+            self.col + 1
+        };
+
         let mut successors = Vec::with_capacity(8);
 
         for row in 0..8 {
-            successors.push(QueensConfig::new_from(&self, row, self.col + 1));
+            successors.push(QueensConfig::new_from(&self, row, new_col));
         }
 
         successors
@@ -79,7 +97,17 @@ impl Config for QueensConfig {
     }
 
     fn is_goal(&self) -> bool {
-        self.is_valid() && self.col == self.map.len() - 1
+        if !self.is_valid(){
+            return false;
+        }
+
+        for row in self.map.iter() {
+            if !row.contains(&true) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
 
@@ -102,7 +130,7 @@ mod tests {
 
     #[test]
     fn is_valid() {
-        let mut config = QueensConfig::new();
+        let mut config = QueensConfig::new(1, 0);
 
         assert!(config.is_valid(), "starting config is valid");
 
