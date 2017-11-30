@@ -1,5 +1,5 @@
 use std::fmt;
-use config::Config;
+use backtracker::Config;
 
 #[derive(Debug)]
 pub struct QueensConfig {
