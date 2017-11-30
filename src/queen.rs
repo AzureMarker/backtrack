@@ -1,14 +1,15 @@
 use std::fmt;
 use backtracker::Config;
 
-#[derive(Debug)]
+/// This struct holds the configuration of a step in solving the 8 Queens Puzzle
 pub struct QueensConfig {
-    pub map: [[bool; 8]; 8],
-    pub row: usize,
-    pub col: usize
+    map: [[bool; 8]; 8],
+    row: usize,
+    col: usize
 }
 
 impl QueensConfig {
+    /// Create a new config with a queen in the specified row and column
     pub fn new(row: usize, col: usize) -> QueensConfig {
         let mut map = [[false; 8]; 8];
 
@@ -18,6 +19,8 @@ impl QueensConfig {
         QueensConfig { map, row, col }
     }
 
+    /// Create a new config using the map of the old config, with a new queen in the specified
+    /// row and column
     pub fn new_from(old_config: &QueensConfig, row: usize, col: usize) -> QueensConfig {
         let mut new_map = old_config.map;
         new_map[row][col] = true;
@@ -27,6 +30,8 @@ impl QueensConfig {
 }
 
 impl Config for QueensConfig {
+    /// Get all the successive configs from the current config.
+    /// The new configs will have queens positioned in the next column (wrapped around if necessary)
     fn successors(&self) -> Vec<QueensConfig> {
         // Get the next column to generate successors in
         let new_col = if self.col == self.map.len() - 1 {
@@ -48,6 +53,7 @@ impl Config for QueensConfig {
 
         let mut successors = Vec::with_capacity(8);
 
+        // Create the successors
         for row in 0..8 {
             successors.push(QueensConfig::new_from(&self, row, new_col));
         }
@@ -55,9 +61,12 @@ impl Config for QueensConfig {
         successors
     }
 
+    /// Check if the config is valid. This assumes past queens are valid, and only checks the most
+    /// recently added queen to see if it conflicts with other queens.
     fn is_valid(&self) -> bool {
         // Check vertical
         for (i, elem) in self.map.iter().enumerate() {
+            // If it's not the current queen and there is a second queen in the column
             if i != self.row && elem[self.col] {
                 return false;
             }
@@ -66,6 +75,7 @@ impl Config for QueensConfig {
 
         // Check horizontal
         for (i, elem) in self.map[self.row].iter().enumerate() {
+            // If it's no the current queen and there is a second queen in the row
             if i != self.col && *elem {
                 return false;
             }
@@ -73,7 +83,7 @@ impl Config for QueensConfig {
 
         // Check diagonals
         for (row_index, row) in self.map.iter().enumerate() {
-            // Skip the row with the piece we are checking against
+            // Skip the row with the current queen
             if row_index == self.row {
                 continue;
             }
@@ -83,12 +93,14 @@ impl Config for QueensConfig {
             let diagonal2 = self.col as isize + self.row as isize - row_index as isize;
 
             // Check the first diagonal, if it is on the board
-            if 0 <= diagonal1 && diagonal1 < row.len() as isize && self.map[row_index][diagonal1 as usize] {
+            if 0 <= diagonal1 && diagonal1 < row.len() as isize
+                    && self.map[row_index][diagonal1 as usize] {
                 return false;
             }
 
             // Check the second diagonal, if it is on the board
-            if 0 <= diagonal2 && diagonal2 < row.len() as isize && self.map[row_index][diagonal2 as usize] {
+            if 0 <= diagonal2 && diagonal2 < row.len() as isize
+                    && self.map[row_index][diagonal2 as usize] {
                 return false;
             }
         }
@@ -96,23 +108,28 @@ impl Config for QueensConfig {
         true
     }
 
+    /// Check if the config is the final/goal config. It must also be valid.
+    /// The goal is defined as being valid and having a queen in each row
     fn is_goal(&self) -> bool {
+        // Has to be valid
         if !self.is_valid(){
             return false;
         }
 
+        // Check for a queen in each row
         for row in self.map.iter() {
             if !row.contains(&true) {
                 return false;
             }
         }
 
-        return true;
+        true
     }
 }
 
 impl fmt::Display for QueensConfig {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        // Display in grid of `Q` and `-`
         for row in self.map.iter() {
             for elem in row.iter() {
                 write!(f, "{} ", if *elem { "Q" } else { "-" })?;
