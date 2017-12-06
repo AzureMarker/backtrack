@@ -67,6 +67,10 @@ impl Trunk {
 
         grid
     }
+
+    fn copy_grid(&self) -> Vec<Vec<char>> {
+        self.grid.clone()
+    }
 }
 
 impl Config for Trunk {
