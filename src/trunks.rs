@@ -28,10 +28,15 @@ impl Suitcase {
 
 impl Trunk {
     pub fn new(width: usize, height: usize, suitcases: &[Suitcase]) -> Trunk {
+        let mut suitcases_remaining = suitcases.to_vec();
+        suitcases_remaining.sort_by(|a, b|
+            (a.width * a.height).cmp(&(b.width * b.height))
+        );
+
         Trunk {
             width, height,
             grid: vec![vec![DEFAULT_CELL; width]; height],
-            suitcases_remaining: suitcases.to_vec()
+            suitcases_remaining
         }
     }
 
