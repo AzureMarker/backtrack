@@ -20,6 +20,12 @@ pub struct Suitcase {
     pub name: char
 }
 
+impl Suitcase {
+    fn flip(&self) -> Suitcase {
+        Suitcase { width: self.height, height: self.width, name: self.name }
+    }
+}
+
 impl Trunk {
     pub fn new(width: usize, height: usize, suitcases: &[Suitcase]) -> Trunk {
         Trunk {
@@ -30,15 +36,18 @@ impl Trunk {
     }
 
     fn from(trunk: &Trunk, grid: Vec<Vec<char>>) -> Trunk {
+        let mut suitcases_remaining = trunk.suitcases_remaining.clone();
+        suitcases_remaining.pop();
+
         Trunk {
             width: trunk.width,
             height: trunk.height,
             grid,
-            suitcases_remaining: trunk.suitcases_remaining.clone(),
+            suitcases_remaining
         }
     }
 
-    fn will_fit(grid: &Vec<Vec<char>>, start_row: usize, start_col: usize, suitcase: Suitcase)
+    fn will_fit(grid: &Vec<Vec<char>>, start_row: usize, start_col: usize, suitcase: &Suitcase)
             -> bool {
         // Simple bounds check as a heuristic
         if start_row + suitcase.height > grid.len() || start_col + suitcase.width > grid[0].len() {
@@ -57,8 +66,8 @@ impl Trunk {
         true
     }
 
-    fn add_suitcase<'a>(grid: &'a mut Vec<Vec<char>>, start_row: usize, start_col: usize, suitcase: &Suitcase)
-            -> &'a mut Vec<Vec<char>>{
+    fn add_suitcase(mut grid: Vec<Vec<char>>, start_row: usize, start_col: usize, suitcase: &Suitcase)
+            -> Vec<Vec<char>>{
         for row in start_row..(start_row + suitcase.height) {
             for col in start_col..(start_col + suitcase.width) {
                 grid[row][col] = suitcase.name;
@@ -75,7 +84,33 @@ impl Trunk {
 
 impl Config for Trunk {
     fn successors(&self) -> Vec<Self> {
-        vec![]
+        let suitcase = match self.suitcases_remaining.last() {
+            Some(s) => s,
+            None => return vec![]
+        };
+
+        let mut successors = vec![];
+
+        for row in 0..self.height {
+            for col in 0..self.width {
+                // Check if the suitcase fits without flipping
+                if Trunk::will_fit(&self.grid, row, col, suitcase) {
+                    successors.push(Trunk::from(&self, Trunk::add_suitcase(
+                        self.copy_grid(),row, col, &suitcase
+                    )));
+                }
+
+                // Try flipped
+                let flipped_suitcase = suitcase.flip();
+                if Trunk::will_fit(&self.grid, row, col, &flipped_suitcase) {
+                    successors.push(Trunk::from(&self, Trunk::add_suitcase(
+                        self.copy_grid(),row, col, &flipped_suitcase
+                    )));
+                }
+            }
+        }
+
+        successors
     }
 
     fn is_valid(&self) -> bool {
