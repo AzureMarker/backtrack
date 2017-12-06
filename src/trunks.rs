@@ -1,6 +1,8 @@
 use std::fmt;
 use backtracker::Config;
 
+static DEFAULT_CELL: char = '-';
+
 /// This struct holds the configuration of a step in solving the Trunks problem
 #[derive(Debug)]
 pub struct Trunk {
@@ -22,7 +24,7 @@ impl Trunk {
     pub fn new(width: usize, height: usize, suitcases: &[Suitcase]) -> Trunk {
         Trunk {
             width, height,
-            grid: vec![vec!['-'; width]; height],
+            grid: vec![vec![DEFAULT_CELL; width]; height],
             suitcases_remaining: suitcases.to_vec()
         }
     }
@@ -34,6 +36,24 @@ impl Trunk {
             grid,
             suitcases_remaining: trunk.suitcases_remaining.clone(),
         }
+    }
+
+    fn will_fit(grid: &Vec<Vec<char>>, start_row: usize, start_col: usize, suitcase: Suitcase) -> bool {
+        // Simple bounds check as a heuristic
+        if start_row + suitcase.height > grid.len() || start_col + suitcase.width > grid[0].len() {
+            return false;
+        }
+
+        // Make sure there's no suitcases in the way
+        for row in start_row..(start_row + suitcase.height) {
+            for col in start_col..(start_col + suitcase.width) {
+                if row > grid.len() || col > grid[row].len() || grid[row][col] != DEFAULT_CELL {
+                    return false;
+                }
+            }
+        }
+
+        true
     }
 }
 
