@@ -55,6 +55,16 @@ impl Trunk {
 
         true
     }
+
+    fn add_suitcase(grid: &mut Vec<Vec<char>>, start_row: usize, start_col: usize, suitcase: &Suitcase) -> &mut Vec<Vec<char>>{
+        for row in start_row..(start_row + suitcase.height) {
+            for col in start_col..(start_col + suitcase.width) {
+                grid[row][col] = suitcase.name;
+            }
+        }
+
+        grid
+    }
 }
 
 impl Config for Trunk {
