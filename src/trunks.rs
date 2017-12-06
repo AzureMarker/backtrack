@@ -26,6 +26,15 @@ impl Trunk {
             suitcases_remaining: suitcases.to_vec()
         }
     }
+
+    fn from(trunk: &Trunk, grid: Vec<Vec<char>>) -> Trunk {
+        Trunk {
+            width: trunk.width,
+            height: trunk.height,
+            grid,
+            suitcases_remaining: trunk.suitcases_remaining.clone(),
+        }
+    }
 }
 
 impl Config for Trunk {
