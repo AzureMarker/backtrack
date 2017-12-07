@@ -177,6 +177,11 @@ impl Config for Trunk {
                     )));
                 }
 
+                // If the suitcase is square, don't flip it (it would duplicate a successor)
+                if suitcase.width == suitcase.height {
+                    continue;
+                }
+
                 // Try flipped
                 let flipped_suitcase = suitcase.flip();
                 if Trunk::will_fit(&self.grid, row, col, &flipped_suitcase) {
