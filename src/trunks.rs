@@ -4,6 +4,7 @@ use std::io::prelude::*;
 use std::fs::File;
 use backtracker::Config;
 
+/// Default cell char which designates an empty cell
 static DEFAULT_CELL: char = '-';
 
 /// This struct holds the configuration of a step in solving the Trunks problem
@@ -24,14 +25,23 @@ pub struct Suitcase {
 }
 
 impl Suitcase {
+    /// Get a new suitcase flipped by 90 degrees
     fn flip(&self) -> Suitcase {
         Suitcase { width: self.height, height: self.width, name: self.name }
     }
 }
 
 impl Trunk {
+    /// Create a starting Trunk config
+    ///
+    /// # Arguments
+    /// * `width` - the width of the trunk
+    /// * `height` - the height of the trunk
+    /// * `suitcases` - the suitcases to add to the trunk
     pub fn new(width: usize, height: usize, suitcases: &[Suitcase]) -> Trunk {
         let mut suitcases_remaining = suitcases.to_vec();
+
+        // Sort them so that we add them in order of largest to smallest
         suitcases_remaining.sort_by(|a, b|
             (a.width * a.height).cmp(&(b.width * b.height))
         );
@@ -43,19 +53,27 @@ impl Trunk {
         }
     }
 
+    /// Read a Trunk config from a file
+    ///
+    /// # Arguments
+    /// * `filename` - the filename of the config to read
     pub fn read_from_file(filename: &str) -> io::Result<Trunk> {
+        // Read in the file
         let mut file = File::open(filename)?;
         let mut contents = String::new();
 
         file.read_to_string(&mut contents)?;
 
+        // Split it into lines
         let mut lines = contents.lines();
         let header = lines.nth(0).unwrap();
 
+        // Parse the header
         let mut header_split = header.split_whitespace();
         let width: usize = header_split.nth(0).unwrap().parse().unwrap();
         let height: usize = header_split.nth(0).unwrap().parse().unwrap();
 
+        // Parse the suitcases
         let suitcases: Vec<Suitcase> = lines
             .map(|line| {
                 let split: Vec<&str> = line.split_whitespace().collect();
@@ -67,9 +85,16 @@ impl Trunk {
             })
             .collect();
 
+        // Make the Trunk
         Ok(Trunk::new(width, height, &suitcases))
     }
 
+    /// Create a Trunk from an existing one. This will copy the existing Trunk's Suitcase stack and
+    /// pop off the last suitcase for the new Trunk.
+    ///
+    /// # Arguments
+    /// * `trunk` - the base Trunk
+    /// * `grid` - the grid for the new Trunk
     fn from(trunk: &Trunk, grid: Vec<Vec<char>>) -> Trunk {
         let mut suitcases_remaining = trunk.suitcases_remaining.clone();
         suitcases_remaining.pop();
@@ -82,6 +107,13 @@ impl Trunk {
         }
     }
 
+    /// Check if the suitcase will fit in the grid, starting from a certain row and column
+    ///
+    /// # Arguments
+    /// * `grid` - the grid to check against
+    /// * `start_row` - the starting row
+    /// * `start_col` - the starting column
+    /// * `suitcase` - the Suitcase to check with
     fn will_fit(grid: &Vec<Vec<char>>, start_row: usize, start_col: usize, suitcase: &Suitcase)
             -> bool {
         // Simple bounds check as a heuristic
@@ -101,6 +133,15 @@ impl Trunk {
         true
     }
 
+    /// Add a Suitcase to a grid (does not check if it fits, use [will_fit](Trunk::will_fit) for
+    /// that). Ownership of `grid` will be returned in the return value. This is used for syntactic
+    /// convenience.
+    ///
+    /// # Arguments
+    /// * `grid` - the grid to modify (ownership is returned at the end)
+    /// * `start_row` - the starting row
+    /// * `start_col` - the starting column
+    /// * `suitcase` - the [Suitcase](Suitcase) to add
     fn add_suitcase(mut grid: Vec<Vec<char>>, start_row: usize, start_col: usize, suitcase: &Suitcase)
             -> Vec<Vec<char>>{
         for row in start_row..(start_row + suitcase.height) {
@@ -112,6 +153,7 @@ impl Trunk {
         grid
     }
 
+    /// Return a copy of the grid
     fn copy_grid(&self) -> Vec<Vec<char>> {
         self.grid.clone()
     }
