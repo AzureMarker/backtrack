@@ -13,4 +13,7 @@ name = "trunk-pack"
 path = "src/trunk-pack.rs"
 doc = false
 
+[features]
+bench = []
+
 [dependencies]

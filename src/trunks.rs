@@ -8,7 +8,7 @@ use backtracker::Config;
 static DEFAULT_CELL: char = '-';
 
 /// This struct holds the configuration of a step in solving the Trunks problem
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Trunk {
     width: usize,
     height: usize,
@@ -214,5 +214,88 @@ impl fmt::Display for Trunk {
         }
 
         Ok(())
+    }
+}
+
+#[cfg(all(feature = "bench", test))]
+mod bench {
+    use super::*;
+    use backtracker;
+
+    extern crate test;
+    use self::test::Bencher;
+
+    fn benchmark_config(filename: &str, b: &mut Bencher) {
+        let trunk = Trunk::read_from_file(filename).unwrap();
+        b.iter(||
+            test::black_box(
+                backtracker::solve(trunk.clone())
+            )
+        );
+    }
+
+    #[bench]
+    fn ten_by_six_cannot(b: &mut Bencher) {
+        benchmark_config("data/10-6-cannot.txt", b);
+    }
+
+    #[bench]
+    fn ten_by_seven_cannot(b: &mut Bencher) {
+        benchmark_config("data/10-7-cannot.txt", b);
+    }
+
+    #[bench]
+    fn eleven_by_four(b: &mut Bencher) {
+        benchmark_config("data/11-4.txt", b);
+    }
+
+    #[bench]
+    fn eleven_by_four_cannot(b: &mut Bencher) {
+        benchmark_config("data/11-4-cannot.txt", b);
+    }
+
+    #[bench]
+    fn eleven_by_fourteen_full(b: &mut Bencher) {
+        benchmark_config("data/11-14-full.txt", b);
+    }
+
+    #[bench]
+    fn eleven_by_fourteen_full_b(b: &mut Bencher) {
+        benchmark_config("data/11-14-full-B.txt", b);
+    }
+
+    #[bench]
+    fn eleven_by_fourteen_full_c(b: &mut Bencher) {
+        benchmark_config("data/11-14-full-C.txt", b);
+    }
+
+    #[bench]
+    fn eleven_by_fourteen_not_full(b: &mut Bencher) {
+        benchmark_config("data/11-14-notfull.txt", b);
+    }
+
+    #[bench]
+    fn thirteen_by_ten_full(b: &mut Bencher) {
+        benchmark_config("data/13-10-full.txt", b);
+    }
+
+    #[bench]
+    fn thirteen_by_ten_not_full(b: &mut Bencher) {
+        benchmark_config("data/13-10-notfull.txt", b);
+    }
+
+    #[bench]
+    fn default_1(b: &mut Bencher) {
+        benchmark_config("data/default-1.txt", b);
+    }
+
+    #[bench]
+    fn default_2(b: &mut Bencher) {
+        benchmark_config("data/default-2.txt", b);
+    }
+
+    #[bench]
+    fn default_3(b: &mut Bencher) {
+        benchmark_config("data/default-3.txt", b);
     }
 }
