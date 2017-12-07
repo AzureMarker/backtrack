@@ -227,6 +227,8 @@ mod bench {
 
     /// Generate benchmark functions given a function name and the config path
     macro_rules! benchmark {
+        // This signature shows that it takes in 1 or more function names and expressions
+        // in the format `function_name: expression` with commas between each set.
         ( $( $fn_name:ident: $file:expr ),+ ) => {
             $(
                 #[bench]
@@ -239,14 +241,19 @@ mod bench {
 
     /// Read the Trunk config and run the benchmark
     fn benchmark_config(filename: &str, b: &mut Bencher) {
+        // Read in the trunk once so we don't accidentally benchmark the IO
         let trunk = Trunk::read_from_file(filename).unwrap();
+
+        // Benchmark the function multiple times
         b.iter(||
+            // test::black_box makes sure the compiler doesn't optimize away the result of solve()
             test::black_box(
                 backtracker::solve(trunk.clone())
             )
         );
     }
 
+    // Generate the benchmarking functions
     benchmark!(
         ten_by_six_cannot:              "data/10-6-cannot.txt",
         ten_by_seven_cannot:            "data/10-7-cannot.txt",
