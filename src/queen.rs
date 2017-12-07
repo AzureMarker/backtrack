@@ -21,7 +21,7 @@ impl QueensConfig {
 
     /// Create a new config using the map of the old config, with a new queen in the specified
     /// row and column
-    pub fn new_from(old_config: &QueensConfig, row: usize, col: usize) -> QueensConfig {
+    fn from(old_config: &QueensConfig, row: usize, col: usize) -> QueensConfig {
         let mut new_map = old_config.map;
         new_map[row][col] = true;
 
@@ -55,7 +55,7 @@ impl Config for QueensConfig {
 
         // Create the successors
         for row in 0..8 {
-            successors.push(QueensConfig::new_from(&self, row, new_col));
+            successors.push(QueensConfig::from(&self, row, new_col));
         }
 
         successors
