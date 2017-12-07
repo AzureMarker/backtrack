@@ -225,6 +225,19 @@ mod bench {
     extern crate test;
     use self::test::Bencher;
 
+    /// Generate benchmark functions given a function name and the config path
+    macro_rules! benchmark {
+        ( $( $fn_name:ident: $file:expr ),+ ) => {
+            $(
+                #[bench]
+                fn $fn_name(b: &mut Bencher) {
+                    benchmark_config($file, b);
+                }
+            )*
+        };
+    }
+
+    /// Read the Trunk config and run the benchmark
     fn benchmark_config(filename: &str, b: &mut Bencher) {
         let trunk = Trunk::read_from_file(filename).unwrap();
         b.iter(||
@@ -234,68 +247,19 @@ mod bench {
         );
     }
 
-    #[bench]
-    fn ten_by_six_cannot(b: &mut Bencher) {
-        benchmark_config("data/10-6-cannot.txt", b);
-    }
-
-    #[bench]
-    fn ten_by_seven_cannot(b: &mut Bencher) {
-        benchmark_config("data/10-7-cannot.txt", b);
-    }
-
-    #[bench]
-    fn eleven_by_four(b: &mut Bencher) {
-        benchmark_config("data/11-4.txt", b);
-    }
-
-    #[bench]
-    fn eleven_by_four_cannot(b: &mut Bencher) {
-        benchmark_config("data/11-4-cannot.txt", b);
-    }
-
-    #[bench]
-    fn eleven_by_fourteen_full(b: &mut Bencher) {
-        benchmark_config("data/11-14-full.txt", b);
-    }
-
-    #[bench]
-    fn eleven_by_fourteen_full_b(b: &mut Bencher) {
-        benchmark_config("data/11-14-full-B.txt", b);
-    }
-
-    #[bench]
-    fn eleven_by_fourteen_full_c(b: &mut Bencher) {
-        benchmark_config("data/11-14-full-C.txt", b);
-    }
-
-    #[bench]
-    fn eleven_by_fourteen_not_full(b: &mut Bencher) {
-        benchmark_config("data/11-14-notfull.txt", b);
-    }
-
-    #[bench]
-    fn thirteen_by_ten_full(b: &mut Bencher) {
-        benchmark_config("data/13-10-full.txt", b);
-    }
-
-    #[bench]
-    fn thirteen_by_ten_not_full(b: &mut Bencher) {
-        benchmark_config("data/13-10-notfull.txt", b);
-    }
-
-    #[bench]
-    fn default_1(b: &mut Bencher) {
-        benchmark_config("data/default-1.txt", b);
-    }
-
-    #[bench]
-    fn default_2(b: &mut Bencher) {
-        benchmark_config("data/default-2.txt", b);
-    }
-
-    #[bench]
-    fn default_3(b: &mut Bencher) {
-        benchmark_config("data/default-3.txt", b);
-    }
+    benchmark!(
+        ten_by_six_cannot:              "data/10-6-cannot.txt",
+        ten_by_seven_cannot:            "data/10-7-cannot.txt",
+        eleven_by_four:                 "data/11-4.txt",
+        eleven_by_four_cannot:          "data/11-4-cannot.txt",
+        eleven_by_fourteen_full:        "data/11-14-full.txt",
+        eleven_by_fourteen_full_b:      "data/11-14-full-B.txt",
+        eleven_by_fourteen_full_c:      "data/11-14-full-C.txt",
+        eleven_by_fourteen_not_full:    "data/11-14-notfull.txt",
+        thirteen_by_ten_full:           "data/13-10-full.txt",
+        thirteen_by_ten_not_full:       "data/13-10-notfull.txt",
+        default_1:                      "data/default-1.txt",
+        default_2:                      "data/default-2.txt",
+        default_3:                      "data/default-3.txt"
+    );
 }
