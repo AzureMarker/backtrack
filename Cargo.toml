@@ -3,4 +3,9 @@ name = "backtrack"
 version = "0.1.0"
 authors = ["Mcat12 <newtoncat12@yahoo.com>"]
 
+[[bin]]
+name = "8queens"
+path = "src/8queens.rs"
+doc = false
+
 [dependencies]
