@@ -8,4 +8,9 @@ name = "8queens"
 path = "src/8queens.rs"
 doc = false
 
+[[bin]]
+name = "trunk-pack"
+path = "src/trunk-pack.rs"
+doc = false
+
 [dependencies]

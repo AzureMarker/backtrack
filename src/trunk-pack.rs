@@ -1,9 +1,7 @@
-mod backtracker;
-mod queen;
-mod trunks;
+extern crate backtrack;
 
 use std::env;
-use trunks::{Trunk, Suitcase};
+use backtrack::trunks::{Trunk, Suitcase};
 
 fn main() {
     let default_config = Trunk::new(3, 3, &[
@@ -29,7 +27,7 @@ fn main() {
     // Solve the puzzle
     println!(
         "{}",
-        match backtracker::solve(config) {
+        match backtrack::solve(config) {
             Some(solution) => format!("{}", solution),
             None => "No solution found".to_string()
         }
