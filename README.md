@@ -13,6 +13,11 @@ This will create `trunk-pack` and `8queens` in `target/release`.
 If you want to run them without the overhead of cargo getting in the way, run
 them directly from the `target/releases` directory.
 
+Benchmarking (requires nightly Rust):
+```bash
+cargo bench
+```
+
 ## Trunk Pack
 This binary will take in an optional text file containing the starting config.
 See the files under `data` for such files. If started without a test file,
