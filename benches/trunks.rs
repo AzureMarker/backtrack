@@ -1,9 +1,5 @@
-#![feature(test)]
-extern crate backtrack;
-extern crate test;
-
 use backtrack::trunks::Trunk;
-use test::Bencher;
+use criterion::{Criterion, criterion_group, criterion_main};
 
 /// Generate benchmark functions given a function name and the config path
 macro_rules! benchmark {
@@ -11,29 +7,31 @@ macro_rules! benchmark {
     // in the format `function_name: expression` with commas between each set.
     ( $( $fn_name:ident: $file:expr ),+ ) => {
         $(
-            #[bench]
-            fn $fn_name(b: &mut Bencher) {
+            fn $fn_name(b: &mut Criterion) {
                 benchmark_config($file, b);
             }
+
         )*
-    };
+
+        criterion_group!(benches, $($fn_name),*);
+        criterion_main!(benches);
+    }
 }
 
 /// Read the Trunk config and run the benchmark
-fn benchmark_config(filename: &str, b: &mut Bencher) {
+fn benchmark_config(filename: &str, c: &mut Criterion) {
     // Read in the trunk once so we don't accidentally benchmark the IO
     let trunk = Trunk::read_from_file(filename).unwrap();
 
     // Benchmark the function multiple times
-    b.iter(||
-        // test::black_box makes sure the compiler doesn't optimize away the result of solve()
-        test::black_box(
+    c.bench_function(filename, move |b| b.iter(||
+        // black_box makes sure the compiler doesn't optimize away the result of solve()
+        criterion::black_box(
             backtrack::solve(trunk.clone())
         )
-    );
+    ));
 }
 
-// Generate the benchmarking functions
 benchmark!(
     ten_by_six_cannot:              "data/10-6-cannot.txt",
     ten_by_seven_cannot:            "data/10-7-cannot.txt",

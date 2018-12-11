@@ -1,5 +1,5 @@
 use std::fmt;
-use backtracker::Config;
+use crate::backtracker::Config;
 
 /// This struct holds the configuration of a step in solving the 8 Queens Puzzle
 pub struct QueensConfig {

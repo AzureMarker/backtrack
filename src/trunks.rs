@@ -2,7 +2,7 @@ use std::fmt;
 use std::io;
 use std::io::prelude::*;
 use std::fs::File;
-use backtracker::Config;
+use crate::backtracker::Config;
 
 /// Default cell char which designates an empty cell
 static DEFAULT_CELL: char = '-';

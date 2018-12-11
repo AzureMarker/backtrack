@@ -3,6 +3,8 @@ name = "backtrack"
 version = "0.1.0"
 authors = ["Mcat12 <newtoncat12@yahoo.com>"]
 
+edition = "2018"
+
 [[bin]]
 name = "8queens"
 path = "src/8queens.rs"
@@ -13,7 +15,9 @@ name = "trunk-pack"
 path = "src/trunk-pack.rs"
 doc = false
 
-[features]
-bench = []
+[[bench]]
+name = "trunks"
+harness = false
 
-[dependencies]
+[dev-dependencies]
+criterion = "0.2"

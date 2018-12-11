@@ -1,5 +1,3 @@
-extern crate backtrack;
-
 use std::env;
 use backtrack::queen::QueensConfig;
 
